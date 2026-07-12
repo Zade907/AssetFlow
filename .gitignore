@@ -1,0 +1,26 @@
+# Dependencies and builds
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Tooling
+.DS_Store
+*.log
+.vite/
+.idea/
+.vscode/
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Local product-design tooling
+.impeccable/live/session*
+DESIGN.md
+PRODUCT.md

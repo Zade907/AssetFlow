@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: assetflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: assetflow
+      POSTGRES_USER: assetflow
+      POSTGRES_PASSWORD: assetflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - assetflow-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U assetflow -d assetflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  assetflow-postgres-data:
