@@ -471,12 +471,12 @@ Not covered by the hackathon submission, but the architecture is deployment-read
 
 **Team Artemis** — Odoo Hackathon submission.
 
-| Persona | Owns |
+| Member | Owns |
 |---|---|
-| P1 · Foundation Engineer | Auth, RBAC, App Shell, Org Setup |
-| P2 · Assets & Allocation | Assets, Allocations, Transfers |
-| P3 · Bookings & Maintenance | Bookings, Maintenance |
-| P4 · Insights & Notifications | Dashboard, Audits, Reports, Notifications, Activity Logs |
+| **Ruchir Kalokhe** · Foundation Engineer | Auth, RBAC, App Shell, Org Setup |
+| **Atharva Nivatkar** · Assets & Allocation | Assets, Allocations, Transfers |
+| **Harsh Jain** · Bookings & Maintenance | Bookings, Maintenance |
+| **Krishna Naicker** · Insights & Notifications | Dashboard, Audits, Reports, Notifications, Activity Logs |
 
 Every teammate commits to `dev` via PR. `main` is protected. Commit prefix convention: `feat(module): …`, `fix(module): …`, `chore: …`.
 

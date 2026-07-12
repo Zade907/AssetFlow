@@ -198,11 +198,11 @@ Don't ship documentation drift. Reviewers should reject PRs that add features wi
 
 ## 11. Team Contacts
 
-| Persona | Owns |
+| Member | Owns |
 |---|---|
-| P1 | Auth, RBAC, App Shell, Org Setup |
-| P2 | Assets, Allocations, Transfers |
-| P3 | Bookings, Maintenance |
-| P4 | Dashboard, Audits, Reports, Notifications, Activity Logs |
+| **Ruchir Kalokhe** · Foundation Engineer | Auth, RBAC, App Shell, Org Setup |
+| **Atharva Nivatkar** · Assets & Allocation | Assets, Allocations, Transfers |
+| **Harsh Jain** · Bookings & Maintenance | Bookings, Maintenance |
+| **Krishna Naicker** · Insights & Notifications | Dashboard, Audits, Reports, Notifications, Activity Logs |
 
-Contact your assigned persona owner before touching another module's territory.
+Contact the module owner before touching another member's territory.

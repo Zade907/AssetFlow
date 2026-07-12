@@ -2,6 +2,8 @@ import { AllocationStatus, AssetStatus, Prisma } from "@prisma/client";
 
 import { prisma } from "../../config/prisma";
 import { AppError } from "../../utils/app-error";
+import { logActivity } from "../activity-logs/activity-logs.service";
+import { notify } from "../notifications/notify";
 import type {
   CreateAllocationInput,
   ListAllocationsQuery,
@@ -276,6 +278,24 @@ export async function allocateAsset(
     });
   });
 
+  await Promise.all([
+    notify({
+      employeeId: employee.id,
+      type: "ASSET_ALLOCATED",
+      title: "Asset assigned to you",
+      message: `${asset.assetTag} · ${asset.name} has been allocated to you.`,
+      relatedEntityType: "Allocation",
+      relatedEntityId: allocation.id,
+    }),
+    logActivity({
+      employeeId: actor.employeeId,
+      action: "ALLOCATION_CREATED",
+      entityType: "Allocation",
+      entityId: allocation.id,
+      details: { assetId: asset.id, toEmployeeId: employee.id },
+    }),
+  ]);
+
   return serializeAllocation(allocation);
 }
 
@@ -354,5 +374,24 @@ export async function returnAllocation(
 
       return returned;
     })
-    .then(serializeAllocation);
+    .then(async (returned) => {
+      await Promise.all([
+        notify({
+          employeeId: returned.employeeId,
+          type: "ASSET_RETURNED",
+          title: "Asset return recorded",
+          message: `${returned.asset.assetTag} · ${returned.asset.name} has been returned.`,
+          relatedEntityType: "Allocation",
+          relatedEntityId: returned.id,
+        }),
+        logActivity({
+          employeeId: actor.employeeId,
+          action: "ALLOCATION_RETURNED",
+          entityType: "Allocation",
+          entityId: returned.id,
+          details: { assetId: returned.assetId },
+        }),
+      ]);
+      return serializeAllocation(returned);
+    });
 }

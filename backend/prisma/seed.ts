@@ -1,6 +1,9 @@
 import {
+  AllocationStatus,
   AssetCondition,
   AssetStatus,
+  AuditCycleStatus,
+  AuditRecordStatus,
   BookingStatus,
   EmployeeStatus,
   MaintenancePriority,
@@ -336,12 +339,84 @@ async function main() {
     }
   }
 
+  // Active allocation so dashboard "Assets Allocated" is non-zero on first login.
+  const macBookId = assetIdByTag.get("AF-0001");
+  const priyaEmpId = seededEmployeeIds.get("priya-employee@artemis.com");
+  const sarahMgrId = seededEmployeeIds.get("sarah-manager@artemis.com");
+  if (macBookId && priyaEmpId && sarahMgrId) {
+    const existingAllocation = await prisma.allocation.findFirst({
+      where: { assetId: macBookId, status: AllocationStatus.ACTIVE },
+      select: { id: true },
+    });
+    if (!existingAllocation) {
+      const returnDate = new Date();
+      returnDate.setDate(returnDate.getDate() + 14);
+      await prisma.allocation.create({
+        data: {
+          assetId: macBookId,
+          employeeId: priyaEmpId,
+          allocatedById: sarahMgrId,
+          expectedReturnDate: returnDate,
+          notes: "Assigned for Q3 project work.",
+          status: AllocationStatus.ACTIVE,
+        },
+      });
+      await prisma.asset.update({
+        where: { id: macBookId },
+        data: { status: AssetStatus.ALLOCATED },
+      });
+    }
+  }
+
+  // Draft audit cycle scoped to Engineering so the close-cycle demo has content ready.
+  const engineeringDeptId = departmentIds.get("ENG");
+  const adminId = seededEmployeeIds.get("admin@artemis.com");
+  const arjunAuditorId = seededEmployeeIds.get("arjun.mehta@artemis.com");
+  if (engineeringDeptId && adminId && arjunAuditorId) {
+    const existingCycle = await prisma.auditCycle.findFirst({
+      where: { name: "Q3 2026 Engineering Audit" },
+      select: { id: true },
+    });
+    if (!existingCycle) {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 14);
+      const cycle = await prisma.auditCycle.create({
+        data: {
+          name: "Q3 2026 Engineering Audit",
+          scopeDepartmentId: engineeringDeptId,
+          startDate,
+          endDate,
+          status: AuditCycleStatus.ACTIVE,
+          createdById: adminId,
+        },
+      });
+      await prisma.auditAssignment.create({
+        data: { auditCycleId: cycle.id, auditorId: arjunAuditorId },
+      });
+      // Materialize a checklist row for every seeded asset so the auditor can mark them.
+      for (const asset of assetRegistry) {
+        await prisma.auditRecord.upsert({
+          where: {
+            auditCycleId_assetId: { auditCycleId: cycle.id, assetId: asset.id },
+          },
+          create: {
+            auditCycleId: cycle.id,
+            assetId: asset.id,
+            status: AuditRecordStatus.PENDING,
+          },
+          update: {},
+        });
+      }
+    }
+  }
+
   // Keep AF-XXXX generation ahead of seeded tags.
   await prisma.$executeRaw`CREATE SEQUENCE IF NOT EXISTS asset_tag_sequence START WITH 1 INCREMENT BY 1`;
   await prisma.$executeRaw`SELECT setval('asset_tag_sequence', 6, true)`;
 
   console.log(
-    "Seed complete: 3 departments, 5 categories, 8 employees, 6 assets, 1 booking, 1 maintenance request.",
+    "Seed complete: 3 departments, 5 categories, 11 employees, 6 assets, 1 allocation, 1 booking, 1 maintenance request, 1 active audit cycle.",
   );
   console.log("Admin: admin@artemis.com / demo1234");
   console.log("Asset Manager: sarah-manager@artemis.com / demo1234");
