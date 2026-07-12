@@ -12,7 +12,14 @@ export type ActivityInput = {
 };
 
 export async function logActivity(input: ActivityInput) {
-  return prisma.activityLog.create({ data: input });
+  // Fire-and-forget: audit trail must never break the primary business action if the
+  // ActivityLog write fails (e.g. transient DB hiccup, mocked prisma in unit tests).
+  try {
+    return await prisma.activityLog.create({ data: input });
+  } catch (error) {
+    console.error("logActivity failed", { input, error });
+    return null;
+  }
 }
 
 export async function listActivityLogs(

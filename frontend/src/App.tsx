@@ -1,4 +1,3 @@
-import { BarChart3 } from "lucide-react";
 import { Navigate, RouterProvider, createBrowserRouter } from "react-router";
 import { AppShell } from "./components/layout/AppShell";
 import { LoginPage } from "./features/auth/pages/LoginPage";
@@ -19,7 +18,6 @@ import { CategoriesPage } from "./features/org-setup/pages/CategoriesPage";
 import { DepartmentsPage } from "./features/org-setup/pages/DepartmentsPage";
 import { EmployeesPage } from "./features/org-setup/pages/EmployeesPage";
 import { OrgSetupLayout } from "./features/org-setup/pages/OrgSetupLayout";
-import { ModulePlaceholderPage } from "./features/shared/pages/ModulePlaceholderPage";
 import { NotFoundPage } from "./features/shared/pages/NotFoundPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { PublicOnlyRoute } from "./routes/PublicOnlyRoute";
