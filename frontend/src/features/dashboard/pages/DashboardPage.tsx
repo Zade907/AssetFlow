@@ -9,8 +9,8 @@ import { getErrorMessage } from "../../../lib/utils";
 import { reportsApi } from "../../reports/api";
 
 const quickLinks = [
-  { title: "Browse assets", description: "Find equipment and see current availability.", href: "/assets", icon: Boxes },
-  { title: "View bookings", description: "Review shared resources and upcoming reservations.", href: "/bookings", icon: CalendarClock },
+  { title: "Browse assets", description: "Find equipment and see current availability.", href: "/app/assets", icon: Boxes },
+  { title: "View bookings", description: "Review shared resources and upcoming reservations.", href: "/app/bookings", icon: CalendarClock },
 ];
 
 export function DashboardPage() {
@@ -37,7 +37,7 @@ export function DashboardPage() {
       <section aria-labelledby="quick-actions-heading">
         <h2 id="quick-actions-heading" className="text-xl font-semibold text-[var(--ink)]">Start here</h2>
         <div className="mt-4 divide-y divide-[var(--border)] rounded-xl border border-[var(--border)]">
-          {[...quickLinks, ...(user?.role === "ADMIN" ? [{ title: "Set up your organization", description: "Manage departments, categories, employees, and roles.", href: "/org-setup", icon: Settings2 }] : [])].map(({ title, description, href, icon: Icon }) => (
+          {[...quickLinks, ...(user?.role === "ADMIN" ? [{ title: "Set up your organization", description: "Manage departments, categories, employees, and roles.", href: "/app/org-setup", icon: Settings2 }] : [])].map(({ title, description, href, icon: Icon }) => (
             <Link key={href} to={href} className="group flex min-h-20 items-center gap-4 px-5 py-4 transition-colors duration-200 hover:bg-[var(--surface)] first:rounded-t-xl last:rounded-b-xl">
               <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[var(--primary-soft)] text-[var(--primary)]"><Icon aria-hidden="true" className="size-5" strokeWidth={1.75} /></span>
               <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[var(--ink)]">{title}</span><span className="mt-0.5 block text-sm text-[var(--muted)]">{description}</span></span>

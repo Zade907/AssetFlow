@@ -284,7 +284,7 @@ export function AssetsPage() {
                     <tr
                       key={asset.id}
                       className="cursor-pointer border-t border-[var(--border)] hover:bg-[var(--surface)]"
-                      onClick={() => navigate(`/assets/${asset.id}`)}
+                      onClick={() => navigate(`/app/assets/${asset.id}`)}
                     >
                       <td className="px-4 py-3">
                         <div className="font-medium text-[var(--ink)]">

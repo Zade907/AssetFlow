@@ -76,7 +76,7 @@ export function AuditsPage() {
       } else {
         toast.success("Audit cycle created");
       }
-      navigate(`/audits/${result.cycle.id}`);
+      navigate(`/app/audits/${result.cycle.id}`);
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, "Audit cycle could not be created."));
@@ -163,7 +163,7 @@ export function AuditsPage() {
                 <tr
                   key={cycle.id}
                   className="cursor-pointer border-t border-[var(--border)] hover:bg-[var(--surface)]"
-                  onClick={() => navigate(`/audits/${cycle.id}`)}
+                  onClick={() => navigate(`/app/audits/${cycle.id}`)}
                 >
                   <td className="px-4 py-3 font-medium text-[var(--ink)]">{cycle.name}</td>
                   <td className="px-4 py-3 text-[var(--muted)]">{describeScope(cycle)}</td>

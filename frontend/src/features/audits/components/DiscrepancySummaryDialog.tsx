@@ -50,7 +50,7 @@ export function DiscrepancySummaryDialog({ open, result, onClose }: Props) {
             <ul className="mt-2 divide-y divide-[var(--border)] rounded-lg border border-[var(--border)]">
               {missingAssets.map((asset) => (
                 <li key={asset.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
-                  <Link to={`/assets/${asset.id}`} className="min-w-0 truncate font-medium text-[var(--ink)] hover:underline">
+                  <Link to={`/app/assets/${asset.id}`} className="min-w-0 truncate font-medium text-[var(--ink)] hover:underline">
                     {asset.name}
                   </Link>
                   <span className="shrink-0 font-mono text-xs text-[var(--muted)]">{asset.assetTag}</span>
@@ -68,7 +68,7 @@ export function DiscrepancySummaryDialog({ open, result, onClose }: Props) {
             <ul className="mt-2 divide-y divide-[var(--border)] rounded-lg border border-[var(--border)]">
               {damagedAssets.map((asset) => (
                 <li key={asset.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
-                  <Link to={`/assets/${asset.id}`} className="min-w-0 truncate font-medium text-[var(--ink)] hover:underline">
+                  <Link to={`/app/assets/${asset.id}`} className="min-w-0 truncate font-medium text-[var(--ink)] hover:underline">
                     {asset.name}
                   </Link>
                   <span className="shrink-0 font-mono text-xs text-[var(--muted)]">{asset.assetTag}</span>
