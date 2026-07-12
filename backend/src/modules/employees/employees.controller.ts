@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 
+import { AppError } from "../../utils/app-error";
 import {
   employeeIdParamsSchema,
   listEmployeesQuerySchema,
@@ -13,13 +14,24 @@ export async function listEmployeesController(request: Request, response: Respon
 }
 
 export async function promoteEmployeeController(request: Request, response: Response) {
+  if (!request.auth) {
+    throw new AppError(401, "AUTHENTICATION_REQUIRED", "Authentication is required");
+  }
   const { id } = employeeIdParamsSchema.parse(request.params);
   const { role } = promoteEmployeeSchema.parse(request.body);
-  response.json({ data: await promoteEmployee(id, role) });
+  response.json({
+    data: await promoteEmployee(id, role, {
+      employeeId: request.auth.employeeId,
+      ipAddress: request.ip,
+    }),
+  });
 }
 
 export async function updateEmployeeStatusController(request: Request, response: Response) {
+  if (!request.auth) {
+    throw new AppError(401, "AUTHENTICATION_REQUIRED", "Authentication is required");
+  }
   const { id } = employeeIdParamsSchema.parse(request.params);
   const { status } = updateEmployeeStatusSchema.parse(request.body);
-  response.json({ data: await updateEmployeeStatus(id, status) });
+  response.json({ data: await updateEmployeeStatus(id, status, request.auth.employeeId) });
 }

@@ -12,6 +12,7 @@ const employeeSelect = {
   status: true,
   createdAt: true,
   updatedAt: true,
+  departmentId: true,
   department: { select: { id: true, name: true, code: true } },
   user: { select: { id: true, email: true } },
   headOf: { select: { id: true, name: true, code: true } },
@@ -35,16 +36,58 @@ export function listEmployees(query: ListEmployeesQuery) {
   return prisma.employee.findMany({ where, select: employeeSelect, orderBy: { name: "asc" } });
 }
 
-export async function promoteEmployee(id: string, role: Role) {
-  const employee = await prisma.employee.findUnique({ where: { id }, select: { id: true } });
-  if (!employee) {
-    throw new AppError(404, "EMPLOYEE_NOT_FOUND", "Employee not found");
+type RoleChangeActor = {
+  employeeId: string;
+  ipAddress?: string;
+};
+
+export async function promoteEmployee(id: string, role: Role, actor: RoleChangeActor) {
+  if (id === actor.employeeId) {
+    throw new AppError(403, "SELF_ROLE_CHANGE_FORBIDDEN", "Administrators cannot change their own role");
   }
 
-  return prisma.employee.update({ where: { id }, data: { role }, select: employeeSelect });
+  return prisma.$transaction(async (transaction) => {
+    const employee = await transaction.employee.findUnique({
+      where: { id },
+      select: { id: true, name: true, email: true, role: true },
+    });
+    if (!employee) {
+      throw new AppError(404, "EMPLOYEE_NOT_FOUND", "Employee not found");
+    }
+    if (employee.role === role) {
+      throw new AppError(409, "ROLE_UNCHANGED", `${employee.name} already has this role`);
+    }
+
+    const updated = await transaction.employee.update({
+      where: { id },
+      data: { role },
+      select: employeeSelect,
+    });
+
+    await transaction.activityLog.create({
+      data: {
+        employeeId: actor.employeeId,
+        action: "EMPLOYEE_ROLE_CHANGED",
+        entityType: "Employee",
+        entityId: employee.id,
+        ipAddress: actor.ipAddress,
+        details: {
+          targetName: employee.name,
+          targetEmail: employee.email,
+          previousRole: employee.role,
+          newRole: role,
+        },
+      },
+    });
+
+    return updated;
+  });
 }
 
-export async function updateEmployeeStatus(id: string, status: EmployeeStatus) {
+export async function updateEmployeeStatus(id: string, status: EmployeeStatus, actorEmployeeId: string) {
+  if (id === actorEmployeeId) {
+    throw new AppError(403, "SELF_STATUS_CHANGE_FORBIDDEN", "Administrators cannot change their own account status");
+  }
   const employee = await prisma.employee.findUnique({ where: { id }, select: { id: true } });
   if (!employee) {
     throw new AppError(404, "EMPLOYEE_NOT_FOUND", "Employee not found");

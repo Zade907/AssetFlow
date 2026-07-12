@@ -11,14 +11,20 @@ export type Department = {
   status: EntityStatus;
   parentDepartmentId?: string | null;
   parent?: { id: string; name: string } | null;
-  _count?: { employees?: number };
+  headEmployeeId?: string | null;
+  head?: Pick<Employee, "id" | "name" | "email" | "role" | "status"> | null;
+  _count?: { employees?: number; children?: number };
   employeeCount?: number;
 };
+
+export type CustomFieldType = "text" | "number" | "date" | "boolean";
+export type CustomFieldDefinition = { label: string; type: CustomFieldType; required: boolean };
 
 export type AssetCategory = {
   id: string;
   name: string;
   description?: string | null;
+  customFields?: Record<string, CustomFieldDefinition> | null;
   status: EntityStatus;
   _count?: { assets?: number };
   assetCount?: number;
@@ -54,10 +60,10 @@ export const orgApi = {
     const { data } = await apiClient.get("/departments");
     return unwrapList<Department>(data, ["departments"]);
   },
-  createDepartment(values: { name: string; code: string; parentDepartmentId?: string | null }) {
+  createDepartment(values: { name: string; code: string; parentDepartmentId?: string | null; status: EntityStatus }) {
     return apiClient.post("/departments", values);
   },
-  updateDepartment(id: string, values: { name: string; code: string; parentDepartmentId?: string | null }) {
+  updateDepartment(id: string, values: { name: string; code: string; parentDepartmentId?: string | null; headEmployeeId?: string | null; status: EntityStatus }) {
     return apiClient.patch(`/departments/${id}`, values);
   },
   deleteDepartment(id: string) { return apiClient.delete(`/departments/${id}`); },
@@ -66,12 +72,12 @@ export const orgApi = {
     const { data } = await apiClient.get("/categories");
     return unwrapList<AssetCategory>(data, ["categories"]);
   },
-  createCategory(values: { name: string; description?: string | null }) { return apiClient.post("/categories", values); },
-  updateCategory(id: string, values: { name: string; description?: string | null }) { return apiClient.patch(`/categories/${id}`, values); },
+  createCategory(values: { name: string; description?: string | null; customFields?: Record<string, CustomFieldDefinition> | null; status: EntityStatus }) { return apiClient.post("/categories", values); },
+  updateCategory(id: string, values: { name: string; description?: string | null; customFields?: Record<string, CustomFieldDefinition> | null; status: EntityStatus }) { return apiClient.patch(`/categories/${id}`, values); },
   deleteCategory(id: string) { return apiClient.delete(`/categories/${id}`); },
 
-  async listEmployees() {
-    const { data } = await apiClient.get("/employees");
+  async listEmployees(filters: { search?: string; role?: Role; status?: EntityStatus; departmentId?: string } = {}) {
+    const { data } = await apiClient.get("/employees", { params: filters });
     return unwrapList<unknown>(data, ["employees", "users"]).map(normalizeEmployee);
   },
   promoteEmployee(id: string, role: Role) { return apiClient.patch(`/employees/${id}/promote`, { role }); },
