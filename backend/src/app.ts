@@ -6,9 +6,11 @@ import morgan from "morgan";
 import { env } from "./config/env";
 import { errorHandler, notFoundHandler } from "./middleware/error-handler";
 import { authRouter } from "./modules/auth/auth.routes";
+import { bookingsRouter } from "./modules/bookings/bookings.routes";
 import { categoriesRouter } from "./modules/categories/categories.routes";
 import { departmentsRouter } from "./modules/departments/departments.routes";
 import { employeesRouter } from "./modules/employees/employees.routes";
+import { maintenanceRouter } from "./modules/maintenance/maintenance.routes";
 
 export const app = express();
 
@@ -51,6 +53,8 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/departments", departmentsRouter);
 app.use("/api/v1/categories", categoriesRouter);
 app.use("/api/v1/employees", employeesRouter);
+app.use("/api/v1/bookings", bookingsRouter);
+app.use("/api/v1/maintenance", maintenanceRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
